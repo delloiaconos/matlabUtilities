@@ -1,3 +1,22 @@
+%% 
+ % matlabUtilities: MATLAB Common Utilities 
+ % Copyright (C) 2024 Salvatore Dello Iacono
+ %
+ %
+ % This is free software; you can redistribute it and/or modify
+ % it under the terms of the GNU General Public License as published by
+ % the Free Software Foundation; either version 3 of the License, or
+ % (at your option) any later version.
+ %
+ % This is distributed in the hope that it will be useful,
+ % but WITHOUT ANY WARRANTY; without even the implied warranty of
+ % MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ % GNU General Public License for more details.
+ %
+ %  You should have received a copy of the GNU General Public License
+ %  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ %
+
 function tab2tabular( tbl, fName, varargin )
 %TAB2TABULAR Convert a table to a LaTeX Tabular Structure
 %   tbl: table to be converted
@@ -95,7 +114,8 @@ function tab2tabular( tbl, fName, varargin )
             end
             
             if isfield( locOpts, "Formats" )
-                frmt = string( locOpts.("Formats"){ivar} );
+                frmt = locOpts.("Formats"){ivar};
+                
             else
                 frmt = "%f";
             end
@@ -109,15 +129,20 @@ function tab2tabular( tbl, fName, varargin )
                     for icon = 1:size( cond, 1 )
                         % Matches only the first one!
                         if isa( cond{icon,1}, 'function_handle' ) && ( cond{icon,1}(rowVal) == true )
-                            frmt = string( cond{icon,2} );
+                            frmt = cond{icon,2};
                             break;
                         end
                     end
                 end
             end
-     
-            fprintf( fw, frmt, rowVal );
-
+            
+            if isa( frmt, 'function_handle' )
+                 fprintf( fw, frmt(rowVal) );
+            elseif isa( frmt, 'string' )
+                fprintf( fw, frmt, rowVal );
+            else
+                error( "ERROR: 'Format' should be a format string or a function handler!\n" );
+            end
 
             if ivar == length( vars )
                 fprintf( fw, " \\\\\n" );
