@@ -114,7 +114,8 @@ function tab2tabular( tbl, fName, varargin )
             end
             
             if isfield( locOpts, "Formats" )
-                frmt = string( locOpts.("Formats"){ivar} );
+                frmt = locOpts.("Formats"){ivar};
+                
             else
                 frmt = "%f";
             end
@@ -128,15 +129,20 @@ function tab2tabular( tbl, fName, varargin )
                     for icon = 1:size( cond, 1 )
                         % Matches only the first one!
                         if isa( cond{icon,1}, 'function_handle' ) && ( cond{icon,1}(rowVal) == true )
-                            frmt = string( cond{icon,2} );
+                            frmt = cond{icon,2};
                             break;
                         end
                     end
                 end
             end
-     
-            fprintf( fw, frmt, rowVal );
-
+            
+            if isa( frmt, 'function_handle' )
+                 fprintf( fw, frmt(rowVal) );
+            elseif isa( frmt, 'string' )
+                fprintf( fw, frmt, rowVal );
+            else
+                error( "ERROR: 'Format' should be a format string or a function handler!\n" );
+            end
 
             if ivar == length( vars )
                 fprintf( fw, " \\\\\n" );
