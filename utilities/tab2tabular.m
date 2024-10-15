@@ -1,5 +1,5 @@
 %% 
- % mplotUtility: MATLAB Common Utilities 
+ % matlabUtilities: MATLAB Common Utilities 
  % Copyright (C) 2024 Salvatore Dello Iacono
  %
  %
