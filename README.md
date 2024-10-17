@@ -1,17 +1,16 @@
 # matlabUtilities
-MATLAB Utility Functions
-
-## Overview
-This repository contains a series of additional utility functions for MATLAB, designed to extend the functionality of standard MATLAB libraries and simplify various tasks. 
+MATLAB Utility Functions: This repository contains a series of additional utility functions for MATLAB, designed to extend the functionality of standard MATLAB libraries and simplify various tasks. 
 These functions aim to help users perform common operations more efficiently and make MATLAB code more readable and maintainable.
+
+--------
 
 # Features
 
-- __Custom Functions__: A collection of MATLAB functions to perform various tasks, such as data manipulation, file handling, mathematical operations, and visualization enhancements.
+- __Custom Functions__: A collection of MATLAB functions to perform various tasks, such as data manipulation, file handling, and visualization enhancements.
 - __Easy Integration__: All functions are designed to be easily integrated into existing MATLAB projects.
 
 # Getting Started
-Prerequisites
+## Prerequisites
 Make sure you have a recent version of MATLAB installed. 
 These utility functions have been tested with MATLAB R2024b.
 
@@ -51,7 +50,7 @@ help function_name
 # Related projects
 If you're interested in additional MATLAB utilities, you might also find these related projects useful:
 
-__matplotUtilities__: A collection of functions and utilities designed to enhance MATLAB's plotting capabilities. 
+__mplotUtility__: A collection of functions and utilities designed to enhance MATLAB's plotting capabilities. 
 This project provides tools for creating custom plots, improving plot aesthetics, and automating repetitive plotting tasks. 
 It is ideal for users who want to create high-quality figures for publications or presentations.
 Have a look to the GitHub repository [delloiaconos/mplotUtility](https://github.com/delloiaconos/mplotUtility.git).
