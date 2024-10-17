@@ -28,14 +28,13 @@ clear all;
 close all;
 clc;
 
-%% Include matlabUtilities
+%% Include matlabUtilities and Aliases
 addpath( '../utilities' );
+run('../matlabAliases' );
 
 %%  *********************************************************************   
  %                               Example 01
  %  *********************************************************************  
-
-a2t = @( T ) array2table( T );
 
 % Preparing Data
 tblT = table();
