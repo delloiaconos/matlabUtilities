@@ -16,17 +16,29 @@ Make sure you have a recent version of MATLAB installed.
 These utility functions have been tested with MATLAB R2024b.
 
 ## Installation
-Clone the repository to your local machine:
+
+I always suggest (and I do) to integrate this repository into your existing MATLAB project as a Git submodule.
+
+Add the submodule to your project: In the root directory of your existing Git repository, run the following command to add this repository as a submodule:
 
 ```bash
-git clone https://github.com/delloiaconos/matlabUtilities.git
+git submodule add https://github.com/delloiaconos/matlabUtilities.git matlabUtilities
 ```
-Add the cloned directory to your MATLAB path:
+
+This will clone the utility functions repository into an ```matlabUtilities``` folder within your project.
+
+Initialize and update the submodule: If you're cloning a project that already uses this submodule, you need to initialize and update it:
+
+```bash
+git submodule update --init --recursive
+```
+Add the submodule path to MATLAB: In your MATLAB code, make sure to add the submodule directory to the MATLAB path to access the utility functions:
+
 
 ```matlab
 addpath(genpath('/path/to/matlabUtilities/utilities'));
 ```
-You can also add the directory permanently using the MATLAB pathtool or savepath functions.
+You can also add the directory permanently using the MATLAB ```pathtool``` or ```savepath``` functions.
 
 ## Usage
 __Basic Examples__: each function comes with an example demonstrating how to use it. You can find these examples in the examples directory.
