@@ -56,7 +56,7 @@ function tab2tabular( tbl, fName, varargin )
     nVars = length( vars );
 
     % Check headers
-    if isfield( locOpts, "Headers" )
+    if isfield( locOpts, "Headers" ) & ~isempty( locOpts.("Headers") )
         if length( locOpts.("Headers") ) ~= nVars 
             error( "ERROR: 'Headers' should have the same length as Variables!\n" );
         end
@@ -68,7 +68,7 @@ function tab2tabular( tbl, fName, varargin )
         formats{ivar} = "%f";
     end
     
-    if isfield( locOpts, "Formats" )
+    if isfield( locOpts, "Formats" ) & ~isempty( locOpts.("Formats") )
         opt = locOpts.("Formats");
         optClass = class( opt );
         
@@ -107,7 +107,7 @@ function tab2tabular( tbl, fName, varargin )
         conditioners{ivar} = {};
     end
 
-    if isfield( locOpts, "Conditioners" )
+    if isfield( locOpts, "Conditioners" ) & ~isempty( locOpts.("Conditioners") )
         opt = locOpts.("Conditioners");
         optClass = class( opt );
         
@@ -146,7 +146,7 @@ function tab2tabular( tbl, fName, varargin )
         varfuncs{ivar} = @(x) x;
     end
 
-    if isfield( locOpts, "VarFunctions" )
+    if isfield( locOpts, "VarFunctions" ) & ~isempty( locOpts.("VarFunctions") )
         opt = locOpts.("VarFunctions");
         optClass = class( opt );
         
