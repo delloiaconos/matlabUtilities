@@ -89,8 +89,15 @@ function tab2tabular( tbl, fName, varargin )
                     end
                 end
             end
+        elseif matches( clsFormats, "struct" )
+            ss = locOpts.("Formats");
+            for ii=1:nVars
+                vName = vars{ii};
+                if isfield( ss, vName )
+                    formats{ii} = ss.(vName);
+                end
+            end
         end
-        % TODO: Struct!
     end
     
     % Check Conditioner
