@@ -22,16 +22,19 @@ function tab2tabular( tbl, fName, varargin )
 %   tbl: table to be converted
 %   vars: list of variables to be inserted
     
-    locFields = [ "Variables", "Headers", "Formats", "VarFunctions", "Conditioners", "ConsoleOutput" ];
-    locOpts = struct();
-    
-    vkindex = [];
-    
+    locFields = [ "Variables", "Headers", "Formats",  ...
+                  "VarFunctions", "Conditioners", ...
+                  "SortBy", ...
+                  "ConsoleOutput" ];
+
     if ~istable( tbl )
         error( "ERROR: first argument must be a table!\n" );
     end
 
     % Check which locField is present in varargin
+    locOpts = struct();
+    vkindex = [];
+
     for idx=1:length(locFields)
         field = locFields(idx);
 
@@ -68,7 +71,7 @@ function tab2tabular( tbl, fName, varargin )
         formats{ivar} = "%f";
     end
     
-    if isfield( locOpts, "Formats" ) & ~isempty( locOpts.("Formats") )
+    if isfield( locOpts, "Formats" ) && ~isempty( locOpts.("Formats") )
         opt = locOpts.("Formats");
         optClass = class( opt );
         
@@ -107,7 +110,7 @@ function tab2tabular( tbl, fName, varargin )
         conditioners{ivar} = {};
     end
 
-    if isfield( locOpts, "Conditioners" ) & ~isempty( locOpts.("Conditioners") )
+    if isfield( locOpts, "Conditioners" ) && ~isempty( locOpts.("Conditioners") )
         opt = locOpts.("Conditioners");
         optClass = class( opt );
         
@@ -146,7 +149,7 @@ function tab2tabular( tbl, fName, varargin )
         varfuncs{ivar} = @(x) x;
     end
 
-    if isfield( locOpts, "VarFunctions" ) & ~isempty( locOpts.("VarFunctions") )
+    if isfield( locOpts, "VarFunctions" ) && ~isempty( locOpts.("VarFunctions") )
         opt = locOpts.("VarFunctions");
         optClass = class( opt );
         
@@ -189,6 +192,11 @@ function tab2tabular( tbl, fName, varargin )
             end
         end
     end
+    
+    % Check if table has to be sorted
+    if isfield( locOpts, "SortBy" ) && ~isempty( locOpts.("SortBy") )
+        tbl = sortrows( tbl, locOpts.("SortBy") );
+    end
 
     % NoOutput for DEBUG
     if isfield( locOpts, "ConsoleOutput" ) && ( locOpts.("ConsoleOutput") == true )
@@ -196,7 +204,6 @@ function tab2tabular( tbl, fName, varargin )
     else
         fw = fopen( fName, 'wt');
     end
-    
 
     % Begin Print
     fprintf( fw, "\\begin{tabular}{%s}\n", repmat('c', 1, nVars ) );
@@ -237,7 +244,7 @@ function tab2tabular( tbl, fName, varargin )
             if ~isempty( cond )
                 for icond = 1:size( cond, 1 )
                     % Matches only the first one!
-                    if isa(cond{icond,1}, 'function_handle') & (cond{icond,1}(rowVal) == true)
+                    if isa(cond{icond,1}, 'function_handle') && (cond{icond,1}(rowVal) == true)
                         frmt = cond{icond,2};
                         break;
                     end
