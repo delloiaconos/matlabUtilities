@@ -69,20 +69,21 @@ function tab2tabular( tbl, fName, varargin )
     end
     
     if isfield( locOpts, "Formats" )
-        clsFormats = class( locOpts.("Formats") );
-        if contains( clsFormats , ["cell", "array"] )
+        opt = locOpts.("Formats");
+        optClass = class( opt );
+        
+        if contains( optClass , ["cell", "array"] )
             % if Cell/Array it should have the same length as vars
-            if length( locOpts.("Formats") ) ~= nVars 
+            if length( opt ) ~= nVars 
                 error( "ERROR: 'Formats' should have the same length as Variables!\n" );
             else 
-                formats = locOpts.("Formats");
+                formats = opt;
             end
-        elseif matches( clsFormats, "dictionary" )
-            dd = locOpts.("Formats");
+        elseif matches( optClass, "dictionary" )
             for ii=1:nVars
                 vName = vars{ii};
-                if isKey( dd, vName )
-                    frmt = dd(vName);
+                if isKey( opt, vName )
+                    frmt = opt(vName);
                     if isa( frmt, 'cell' )
                         formats{ii} = frmt{1};
                     else
@@ -90,12 +91,11 @@ function tab2tabular( tbl, fName, varargin )
                     end
                 end
             end
-        elseif matches( clsFormats, "struct" )
-            ss = locOpts.("Formats");
+        elseif matches( optClass, "struct" )
             for ii=1:nVars
                 vName = vars{ii};
-                if isfield( ss, vName )
-                    formats{ii} = ss.(vName);
+                if isfield( opt, vName )
+                    formats{ii} = opt.(vName);
                 end
             end
         end
