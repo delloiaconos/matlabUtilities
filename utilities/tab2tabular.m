@@ -62,7 +62,7 @@ function tab2tabular( tbl, fName, varargin )
         end
     end
     
-    % Check Formats
+    % Check 'Formats'
     formats = cell(1, nVars);
     for ivar=1:nVars
         formats{ivar} = "%f";
@@ -101,7 +101,7 @@ function tab2tabular( tbl, fName, varargin )
         end
     end
     
-    % Check Conditioners
+    % Check 'Conditioners'
     conditioners = cell(1, nVars);
     for ivar=1:nVars
         conditioners{ivar} = {};
@@ -139,7 +139,56 @@ function tab2tabular( tbl, fName, varargin )
             end
         end
     end
+    
+    % Check 'VarFunctions'
+    varfuncs = cell(1, nVars);
+    for ivar=1:nVars
+        varfuncs{ivar} = @(x) x;
+    end
 
+    if isfield( locOpts, "VarFunctions" )
+        opt = locOpts.("VarFunctions");
+        optClass = class( opt );
+        
+        if matches( optClass , "cell" )
+            % if Cell/Array it should have the same length as vars
+            if length( opt ) ~= nVars 
+                error( "ERROR: 'VarFunctions' should have the same length as Variables!\n" );
+            else 
+                varfuncs = opt;
+                for ivar=1:nVars
+                    if ~isa( varfuncs{ivar}, 'function_handle' )
+                        error( "ERROR: 'VarFunctions' should all be function handlers!\n" );
+                    end
+                end
+            end
+        elseif matches( optClass, "dictionary" )
+            for ivar=1:nVars
+                vName = vars{ivar};
+                if isKey( opt, vName )
+                    cond = opt(vName);
+                    if isa( frmt, 'cell' )
+                        varfuncs{ivar} = cond{1};
+                    else
+                        varfuncs{ivar} = cond;
+                    end
+                    if ~isa( varfuncs{ivar}, 'function_handle' )
+                        error( "ERROR: 'VarFunctions' should all be function handlers!\n" );
+                    end
+                end
+            end
+        elseif matches( optClass, "struct" )
+            for ivar=1:nVars
+                vName = vars{ivar};
+                if isfield( opt, vName )
+                    varfuncs{ivar} = opt.(vName);
+                    if ~isa( varfuncs{ivar}, 'function_handle' )
+                        error( "ERROR: 'VarFunctions' should all be function handlers!\n" );
+                    end
+                end
+            end
+        end
+    end
 
     % NoOutput for DEBUG
     if isfield( locOpts, "ConsoleOutput" ) && ( locOpts.("ConsoleOutput") == true )
@@ -182,7 +231,7 @@ function tab2tabular( tbl, fName, varargin )
 
             frmt = formats{ivar};
             
-            rowVal = tbl{irow, var};
+            rowVal = varfuncs{ivar}( tbl{irow, var} );
 
             cond = reshape( conditioners{ivar}, 2, [] )';
             if ~isempty( cond )
