@@ -22,7 +22,7 @@ function tab2tabular( tbl, fName, varargin )
 %   tbl: table to be converted
 %   vars: list of variables to be inserted
     
-    locFields = [ "Variables", "Headers", "Formats", "Conditioner", "NoOutput" ];
+    locFields = [ "Variables", "Headers", "Formats", "VarFunctions", "Conditioners", "ConsoleOutput" ];
     locOpts = struct();
     
     vkindex = [];
@@ -53,29 +53,145 @@ function tab2tabular( tbl, fName, varargin )
         vars = tbl.Properties.VariableNames;
     end
     
+    nVars = length( vars );
+
     % Check headers
     if isfield( locOpts, "Headers" )
-        if length( locOpts.("Headers") ) ~= length( vars ) 
+        if length( locOpts.("Headers") ) ~= nVars 
             error( "ERROR: 'Headers' should have the same length as Variables!\n" );
         end
     end
     
-    % Check Formats
+    % Check 'Formats'
+    formats = cell(1, nVars);
+    for ivar=1:nVars
+        formats{ivar} = "%f";
+    end
+    
     if isfield( locOpts, "Formats" )
-        if length( locOpts.("Formats") ) ~= length( vars ) 
-            error( "ERROR: 'Formats' should have the same length as Variables!\n" );
+        opt = locOpts.("Formats");
+        optClass = class( opt );
+        
+        if contains( optClass , ["cell", "array"] )
+            % if Cell/Array it should have the same length as vars
+            if length( opt ) ~= nVars 
+                error( "ERROR: 'Formats' should have the same length as Variables!\n" );
+            else 
+                formats = opt;
+            end
+        elseif matches( optClass, "dictionary" )
+            for ivar=1:nVars
+                vName = vars{ivar};
+                if isKey( opt, vName )
+                    frmt = opt(vName);
+                    if isa( frmt, 'cell' )
+                        formats{ivar} = frmt{1};
+                    else
+                        formats{ivar} = frmt;
+                    end
+                end
+            end
+        elseif matches( optClass, "struct" )
+            for ivar=1:nVars
+                vName = vars{ivar};
+                if isfield( opt, vName )
+                    formats{ivar} = opt.(vName);
+                end
+            end
         end
     end
     
-    % Check Conditioner
-    if isfield( locOpts, "Conditioner" )
-        if length( locOpts.("Conditioner") ) ~= length( vars ) 
-            error( "ERROR: 'Conditioner' should have the same length as Variables!\n" );
+    % Check 'Conditioners'
+    conditioners = cell(1, nVars);
+    for ivar=1:nVars
+        conditioners{ivar} = {};
+    end
+
+    if isfield( locOpts, "Conditioners" )
+        opt = locOpts.("Conditioners");
+        optClass = class( opt );
+        
+        if contains( optClass , ["cell", "array"] )
+            % if Cell/Array it should have the same length as vars
+            if length( opt ) ~= nVars 
+                error( "ERROR: 'Conditioners' should have the same length as Variables!\n" );
+            else 
+                conditioners = opt;
+            end
+        elseif matches( optClass, "dictionary" )
+            for ivar=1:nVars
+                vName = vars{ivar};
+                if isKey( opt, vName )
+                    cond = opt(vName);
+                    if isa( frmt, 'cell' )
+                        conditioners{ivar} = cond{1};
+                    else
+                        conditioners{ivar} = cond;
+                    end
+                end
+            end
+        elseif matches( optClass, "struct" )
+            for ivar=1:nVars
+                vName = vars{ivar};
+                if isfield( opt, vName )
+                    conditioners{ivar} = opt.(vName);
+                end
+            end
+        end
+    end
+    
+    % Check 'VarFunctions'
+    varfuncs = cell(1, nVars);
+    for ivar=1:nVars
+        varfuncs{ivar} = @(x) x;
+    end
+
+    if isfield( locOpts, "VarFunctions" )
+        opt = locOpts.("VarFunctions");
+        optClass = class( opt );
+        
+        if matches( optClass , "cell" )
+            % if Cell/Array it should have the same length as vars
+            if length( opt ) ~= nVars 
+                error( "ERROR: 'VarFunctions' should have the same length as Variables!\n" );
+            else 
+                varfuncs = opt;
+                for ivar=1:nVars
+                    if ~isa( varfuncs{ivar}, 'function_handle' )
+                        error( "ERROR: 'VarFunctions' should all be function handlers!\n" );
+                    end
+                end
+            end
+        elseif matches( optClass, "dictionary" )
+            for ivar=1:nVars
+                vName = vars{ivar};
+                if isKey( opt, vName )
+                    cond = opt(vName);
+                    if isa( frmt, 'cell' )
+                        varfuncs{ivar} = cond{1};
+                    else
+                        varfuncs{ivar} = cond;
+                    end
+                    if ~isa( varfuncs{ivar}, 'function_handle' )
+                        error( "ERROR: 'VarFunctions' should all be function handlers!\n" );
+                    end
+                end
+            end
+        elseif matches( optClass, "struct" )
+            for ivar=1:nVars
+                vName = vars{ivar};
+                if isfield( opt, vName )
+                    varfuncs{ivar} = opt.(vName);
+                    if ~isa( varfuncs{ivar}, 'function_handle' )
+                        error( "ERROR: 'VarFunctions' should all be function handlers!\n" );
+                    end
+                end
+            end
         end
     end
 
     % NoOutput for DEBUG
-    if isfield( locOpts, "NoOutput" ) && ( locOpts.("NoOutput") == true )
+    if isfield( locOpts, "ConsoleOutput" ) && ( locOpts.("ConsoleOutput") == true )
         fw = 1;
     else
         fw = fopen( fName, 'wt');
@@ -83,12 +199,12 @@ function tab2tabular( tbl, fName, varargin )
     
 
     % Begin Print
-    fprintf( fw, "\\begin{tabular}{%s}\n", repmat('c',1, length(vars) ) );
+    fprintf( fw, "\\begin{tabular}{%s}\n", repmat('c', 1, nVars ) );
     
     if isfield( locOpts, "Headers" )
         headers = locOpts.("Headers");
 
-        for ivar = 1:length(vars)
+        for ivar = 1:nVars
             header = headers(ivar);
             
             if ivar == 1
@@ -106,32 +222,24 @@ function tab2tabular( tbl, fName, varargin )
     end
 
     for irow = 1:height( tbl )
-        for ivar = 1:length(vars)
+        for ivar = 1:nVars
             var = vars(ivar);
             
             if ivar == 1
                 fprintf( fw, "\t" );
             end
-            
-            if isfield( locOpts, "Formats" )
-                frmt = locOpts.("Formats"){ivar};
-                
-            else
-                frmt = "%f";
-            end
-            
-            rowVal = tbl{irow, var};
 
-            if isfield( locOpts, "Conditioner" )
-                cond = locOpts.("Conditioner");
-                cond = reshape( cond{ivar}, 2, [] )';
-                if ~isempty( cond )
-                    for icon = 1:size( cond, 1 )
-                        % Matches only the first one!
-                        if isa( cond{icon,1}, 'function_handle' ) && ( cond{icon,1}(rowVal) == true )
-                            frmt = cond{icon,2};
-                            break;
-                        end
+            frmt = formats{ivar};
+            
+            rowVal = varfuncs{ivar}( tbl{irow, var} );
+
+            cond = reshape( conditioners{ivar}, 2, [] )';
+            if ~isempty( cond )
+                for icond = 1:size( cond, 1 )
+                    % Matches only the first one!
+                    if isa(cond{icond,1}, 'function_handle') & (cond{icond,1}(rowVal) == true)
+                        frmt = cond{icond,2};
+                        break;
                     end
                 end
             end
@@ -144,7 +252,7 @@ function tab2tabular( tbl, fName, varargin )
                 error( "ERROR: 'Format' should be a format string or a function handler!\n" );
             end
 
-            if ivar == length( vars )
+            if ivar == nVars
                 fprintf( fw, " \\\\\n" );
             else
                 fprintf( fw, " & " );
