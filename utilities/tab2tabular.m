@@ -60,16 +60,42 @@ function tab2tabular( tbl, fName, varargin )
         end
     end
     
+    nVars = length( vars );
     % Check Formats
+    formats = cell(nVars, 1);
+    for ii=1:nVars
+        formats{ii} = "%f";
+    end
+    
     if isfield( locOpts, "Formats" )
-        if length( locOpts.("Formats") ) ~= length( vars ) 
-            error( "ERROR: 'Formats' should have the same length as Variables!\n" );
+        clsFormats = class( locOpts.("Formats") );
+        if contains( clsFormats , ["cell", "array"] )
+            % if Cell/Array it should have the same length as vars
+            if length( locOpts.("Formats") ) ~= nVars 
+                error( "ERROR: 'Formats' should have the same length as Variables!\n" );
+            else 
+                formats = locOpts.("Formats");
+            end
+        elseif matches( clsFormats, "dictionary" )
+            dd = locOpts.("Formats");
+            for ii=1:nVars
+                vName = vars{ii};
+                if isKey( dd, vName )
+                    frmt = dd(vName);
+                    if isa( frmt, 'cell' )
+                        formats{ii} = frmt{1};
+                    else
+                        formats{ii} = frmt;
+                    end
+                end
+            end
         end
+        % TODO: Struct!
     end
     
     % Check Conditioner
     if isfield( locOpts, "Conditioner" )
-        if length( locOpts.("Conditioner") ) ~= length( vars ) 
+        if length( locOpts.("Conditioner") ) ~= nVars
             error( "ERROR: 'Conditioner' should have the same length as Variables!\n" );
         end
     end
@@ -112,13 +138,8 @@ function tab2tabular( tbl, fName, varargin )
             if ivar == 1
                 fprintf( fw, "\t" );
             end
-            
-            if isfield( locOpts, "Formats" )
-                frmt = locOpts.("Formats"){ivar};
-                
-            else
-                frmt = "%f";
-            end
+
+            frmt = formats{ivar};
             
             rowVal = tbl{irow, var};
 
