@@ -22,7 +22,7 @@ function tab2tabular( tbl, fName, varargin )
 %   tbl: table to be converted
 %   vars: list of variables to be inserted
     
-    locFields = [ "Variables", "Headers", "Formats", "VarFunctions", "Conditioner", "ConsoleOutput" ];
+    locFields = [ "Variables", "Headers", "Formats", "VarFunctions", "Conditioners", "ConsoleOutput" ];
     locOpts = struct();
     
     vkindex = [];
@@ -101,20 +101,20 @@ function tab2tabular( tbl, fName, varargin )
         end
     end
     
-    % Check Conditioner
+    % Check Conditioners
     conditioners = cell(1, nVars);
     for ivar=1:nVars
         conditioners{ivar} = {};
     end
 
-    if isfield( locOpts, "Conditioner" )
-        opt = locOpts.("Conditioner");
+    if isfield( locOpts, "Conditioners" )
+        opt = locOpts.("Conditioners");
         optClass = class( opt );
         
         if contains( optClass , ["cell", "array"] )
             % if Cell/Array it should have the same length as vars
             if length( opt ) ~= nVars 
-                error( "ERROR: 'Conditioner' should have the same length as Variables!\n" );
+                error( "ERROR: 'Conditioners' should have the same length as Variables!\n" );
             else 
                 conditioners = opt;
             end
