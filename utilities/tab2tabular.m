@@ -53,14 +53,15 @@ function tab2tabular( tbl, fName, varargin )
         vars = tbl.Properties.VariableNames;
     end
     
+    nVars = length( vars );
+
     % Check headers
     if isfield( locOpts, "Headers" )
-        if length( locOpts.("Headers") ) ~= length( vars ) 
+        if length( locOpts.("Headers") ) ~= nVars 
             error( "ERROR: 'Headers' should have the same length as Variables!\n" );
         end
     end
     
-    nVars = length( vars );
     % Check Formats
     formats = cell(nVars, 1);
     for ii=1:nVars
@@ -116,12 +117,12 @@ function tab2tabular( tbl, fName, varargin )
     
 
     % Begin Print
-    fprintf( fw, "\\begin{tabular}{%s}\n", repmat('c',1, length(vars) ) );
+    fprintf( fw, "\\begin{tabular}{%s}\n", repmat('c', 1, nVars ) );
     
     if isfield( locOpts, "Headers" )
         headers = locOpts.("Headers");
 
-        for ivar = 1:length(vars)
+        for ivar = 1:nVars
             header = headers(ivar);
             
             if ivar == 1
@@ -139,7 +140,7 @@ function tab2tabular( tbl, fName, varargin )
     end
 
     for irow = 1:height( tbl )
-        for ivar = 1:length(vars)
+        for ivar = 1:nVars
             var = vars(ivar);
             
             if ivar == 1
@@ -172,7 +173,7 @@ function tab2tabular( tbl, fName, varargin )
                 error( "ERROR: 'Format' should be a format string or a function handler!\n" );
             end
 
-            if ivar == length( vars )
+            if ivar == nVars
                 fprintf( fw, " \\\\\n" );
             else
                 fprintf( fw, " & " );
