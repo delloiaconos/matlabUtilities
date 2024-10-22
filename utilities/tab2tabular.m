@@ -22,7 +22,7 @@ function tab2tabular( tbl, fName, varargin )
 %   tbl: table to be converted
 %   vars: list of variables to be inserted
     
-    locFields = [ "Variables", "Headers", "Formats", "Conditioner", "NoOutput" ];
+    locFields = [ "Variables", "Headers", "Formats", "VarFunctions", "Conditioner", "ConsoleOutput" ];
     locOpts = struct();
     
     vkindex = [];
@@ -109,7 +109,7 @@ function tab2tabular( tbl, fName, varargin )
     end
 
     % NoOutput for DEBUG
-    if isfield( locOpts, "NoOutput" ) && ( locOpts.("NoOutput") == true )
+    if isfield( locOpts, "ConsoleOutput" ) && ( locOpts.("ConsoleOutput") == true )
         fw = 1;
     else
         fw = fopen( fName, 'wt');
