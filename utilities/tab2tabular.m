@@ -22,7 +22,8 @@ function tab2tabular( tbl, fName, varargin )
 %   tbl: table to be converted
 %   vars: list of variables to be inserted
     
-    locFields = [ "Variables", "Headers", "Formats",  ...
+    locFields = [ "Variables", "Headers", 
+                  "DefaultFormat", "Formats",  ...
                   "VarFunctions", "Conditioners", ...
                   "SortBy", ...
                   "ConsoleOutput" ];
@@ -65,10 +66,15 @@ function tab2tabular( tbl, fName, varargin )
         end
     end
     
-    % Check 'Formats'
+    % Check 'Formats' and 'DefaultFormat'
     formats = cell(1, nVars);
+    defFormat = "%f";
+    if isfield( locOpts, "DefaultFormat" ) && ~isempty( locOpts.("DefaultFormat") )
+        defFormat = string( locOpts.("DefaultFormat") );
+    end
+
     for ivar=1:nVars
-        formats{ivar} = "%f";
+        formats{ivar} = defFormat;
     end
     
     if isfield( locOpts, "Formats" ) && ~isempty( locOpts.("Formats") )
