@@ -63,7 +63,7 @@ function tab2tabular( tbl, fName, varargin )
     for ivar=1:nVars
         headers{ivar} = vars{ivar};
     end
-
+    
     if isfield( locOpts, "Headers" ) & ~isempty( locOpts.("Headers") )
         opt = locOpts.("Headers");
         optClass = class( opt );
@@ -305,5 +305,9 @@ function tab2tabular( tbl, fName, varargin )
     end
 
     fprintf( fw, "\\end{tabular}\n" );
+
+    if( fw ~= 1 )
+        fclose( fw );
+    end
 end
 
