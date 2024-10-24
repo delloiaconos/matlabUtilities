@@ -70,7 +70,7 @@ function tab2tabular( tbl, fName, varargin )
         opt = locOpts.("Headers");
         optClass = class( opt );
         
-        if contains( optClass , ["cell", "array"] )
+        if contains( optClass , ["cell", "array", "string"] )
             % if Cell/Array it should have the same length as vars
             if length( opt ) ~= nVars 
                 error( "ERROR: 'Headers' should have the same length as Variables!\n" );
@@ -115,7 +115,7 @@ function tab2tabular( tbl, fName, varargin )
         opt = locOpts.("Formats");
         optClass = class( opt );
         
-        if contains( optClass , ["cell", "array"] )
+        if contains( optClass , ["cell", "array", "string"] )
             % if Cell/Array it should have the same length as vars
             if length( opt ) ~= nVars 
                 error( "ERROR: 'Formats' should have the same length as Variables!\n" );
@@ -154,7 +154,7 @@ function tab2tabular( tbl, fName, varargin )
         opt = locOpts.("Conditioners");
         optClass = class( opt );
         
-        if contains( optClass , ["cell", "array"] )
+        if contains( optClass , ["cell", "array", "string"] )
             % if Cell/Array it should have the same length as vars
             if length( opt ) ~= nVars 
                 error( "ERROR: 'Conditioners' should have the same length as Variables!\n" );
