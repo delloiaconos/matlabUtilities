@@ -22,7 +22,7 @@ function tab2tabular( tbl, fName, varargin )
 %   tbl: table to be converted
 %   vars: list of variables to be inserted
     
-    locFields = [ "Variables", "Headers", 
+    locFields = [ "Variables", "Headers", ...
                   "DefaultFormat", "Formats",  ...
                   "VarFunctions", "Conditioners", ...
                   "SortBy", ...
@@ -60,10 +60,42 @@ function tab2tabular( tbl, fName, varargin )
     nVars = length( vars );
 
     % Check headers
+    for ivar=1:nVars
+        headers{ivar} = vars{ivar};
+    end
+
     if isfield( locOpts, "Headers" ) & ~isempty( locOpts.("Headers") )
-        if length( locOpts.("Headers") ) ~= nVars 
-            error( "ERROR: 'Headers' should have the same length as Variables!\n" );
+        opt = locOpts.("Headers");
+        optClass = class( opt );
+        
+        if contains( optClass , ["cell", "array"] )
+            % if Cell/Array it should have the same length as vars
+            if length( opt ) ~= nVars 
+                error( "ERROR: 'Headers' should have the same length as Variables!\n" );
+            else 
+                headers = opt;
+            end
+        elseif matches( optClass, "dictionary" )
+            for ivar=1:nVars
+                vName = vars{ivar};
+                if isKey( opt, vName )
+                    frmt = opt(vName);
+                    if isa( frmt, 'cell' )
+                        headers{ivar} = frmt{1};
+                    else
+                        headers{ivar} = frmt;
+                    end
+                end
+            end
+        elseif matches( optClass, "struct" )
+            for ivar=1:nVars
+                vName = vars{ivar};
+                if isfield( opt, vName )
+                    headers{ivar} = opt.(vName);
+                end
+            end
         end
+
     end
     
     % Check 'Formats' and 'DefaultFormat'
@@ -215,10 +247,8 @@ function tab2tabular( tbl, fName, varargin )
     fprintf( fw, "\\begin{tabular}{%s}\n", repmat('c', 1, nVars ) );
     
     if isfield( locOpts, "Headers" )
-        headers = locOpts.("Headers");
-
         for ivar = 1:nVars
-            header = headers(ivar);
+            header = headers{ivar};
             
             if ivar == 1
                 fprintf( fw, "\t" );
