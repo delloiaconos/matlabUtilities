@@ -28,8 +28,8 @@ function tab2tabular( tbl, fName, varargin )
                   "DefaultFormat", "Formats",  ...
                   "ConsoleOutput" ];
     
-    separator = '\t';
-    
+    separator = char(9); %\t
+
     if ~istable( tbl )
         error( "ERROR: first argument must be a table!\n" );
     end
