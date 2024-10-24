@@ -27,7 +27,9 @@ function tab2tabular( tbl, fName, varargin )
                   "Headers", "UseVarName" ...
                   "DefaultFormat", "Formats",  ...
                   "ConsoleOutput" ];
-
+    
+    separator = '\t';
+    
     if ~istable( tbl )
         error( "ERROR: first argument must be a table!\n" );
     end
@@ -246,6 +248,7 @@ function tab2tabular( tbl, fName, varargin )
     % Begin Print
     fprintf( fw, "\\begin{tabular}{%s}\n", repmat('c', 1, nVars ) );
     
+    % Print HEADERS
     if isfield( locOpts, "Headers" ) || isfield( locOpts, "UseVarName" ) 
         for ivar = 1:nVars
             header = headers{ivar};
@@ -257,13 +260,14 @@ function tab2tabular( tbl, fName, varargin )
             fprintf( fw, "\\textbf{%s}", header );
 
             if ivar == length( vars )
-                fprintf( fw, " \\\\\n" );
+                fprintf( fw, "%c\\\\\n", separator );
             else
-                fprintf( fw, " & " );
+                fprintf( fw, "%c&%c", separator, separator );
             end
         end
     end
-
+    
+    % Print ROWS
     for irow = 1:height( tbl )
         for ivar = 1:nVars
             var = vars(ivar);
@@ -296,9 +300,9 @@ function tab2tabular( tbl, fName, varargin )
             end
 
             if ivar == nVars
-                fprintf( fw, " \\\\\n" );
+                fprintf( fw, "%c\\\\\n", separator );
             else
-                fprintf( fw, " & " );
+                fprintf( fw, "%c&%c", separator, separator );
             end
 
         end
